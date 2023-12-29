@@ -6,6 +6,7 @@ use App\Repository\BankAccountRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: BankAccountRepository::class)]
 class BankAccount
@@ -13,24 +14,32 @@ class BankAccount
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["banqueAccount_group"])]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups(["banqueAccount_group"])]
     private ?float $bnk_balance = null;
 
     #[ORM\Column]
+    #[Groups(["banqueAccount_group"])]
     private ?bool $bnk_debit = null;
 
-    #[ORM\ManyToOne(inversedBy: 'bankAccounts')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'bankAccounts', cascade: ['persist'])]
+    #[Groups(["banqueAccount_group"])]
     private ?User $fk_usr_id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'bankAccounts')]
+    #[ORM\ManyToOne(fetch: 'EAGER', inversedBy: 'bankAccounts', cascade: ['persist'])]
+    #[Groups(["banqueAccount_group"])]
     private ?AccountType $fk_act_id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+
+    #[ORM\OneToOne(fetch: 'EAGER', cascade: ['persist', 'remove'])]
+    #[Groups(["banqueAccount_group"])]
     private ?Forecast $fk_frc_id = null;
 
-    #[ORM\OneToMany(mappedBy: 'fk_bnk_id', targetEntity: Transaction::class)]
+    #[ORM\OneToMany(fetch: 'EAGER', mappedBy: 'fk_bnk_id', targetEntity: Transaction::class)]
+    #[Groups(["banqueAccount_group"])]
     private Collection $transactions;
 
     public function __construct()

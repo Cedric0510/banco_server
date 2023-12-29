@@ -6,6 +6,8 @@ use App\Repository\AccountTypeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
+
 
 #[ORM\Entity(repositoryClass: AccountTypeRepository::class)]
 class AccountType
@@ -13,12 +15,17 @@ class AccountType
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["account_type_groups",])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(["account_type_groups", "banqueAccount_group"])]
+
     private ?string $act_type = null;
 
     #[ORM\OneToMany(mappedBy: 'fk_act_id', targetEntity: BankAccount::class)]
+
+
     private Collection $bankAccounts;
 
     public function __construct()

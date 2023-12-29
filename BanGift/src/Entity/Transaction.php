@@ -3,10 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\TransactionRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 class Transaction
@@ -14,33 +13,32 @@ class Transaction
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(["transaction_read"])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Groups(["transaction_read", "transaction_write", "banqueAccount_group"])]
     private ?\DateTimeInterface $trs_date = null;
 
     #[ORM\Column]
+    #[Groups(["transaction_read", "transaction_write", "banqueAccount_group"])]
     private ?float $trs_amount = null;
 
     #[ORM\Column]
+    #[Groups(["transaction_read", "transaction_write", "banqueAccount_group"])]
     private ?bool $trs_debit = null;
 
-    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'transactions')]
-    private ?self $fk_trt_id = null;
-
-    #[ORM\OneToMany(mappedBy: 'fk_trt_id', targetEntity: self::class)]
-    private Collection $transactions;
+    #[ORM\ManyToOne(inversedBy: 'transactions')]
+    #[Groups(["transaction_write", "transaction_read"])]
+    private ?TransactionType $fk_trt_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
+    #[Groups(["transaction_read", "transaction_write", "banqueAccount_group"])]
     private ?Category $fk_cat_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'transactions')]
+    #[Groups(["transaction_write"])]
     private ?BankAccount $fk_bnk_id = null;
-
-    public function __construct()
-    {
-        $this->transactions = new ArrayCollection();
-    }
 
     public function getId(): ?int
     {
@@ -83,44 +81,14 @@ class Transaction
         return $this;
     }
 
-    public function getFkTrtId(): ?self
+    public function getFkTrtId(): ?TransactionType
     {
         return $this->fk_trt_id;
     }
 
-    public function setFkTrtId(?self $fk_trt_id): static
+    public function setFkTrtId(?TransactionType $fk_trt_id): static
     {
         $this->fk_trt_id = $fk_trt_id;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, self>
-     */
-    public function getTransactions(): Collection
-    {
-        return $this->transactions;
-    }
-
-    public function addTransaction(self $transaction): static
-    {
-        if (!$this->transactions->contains($transaction)) {
-            $this->transactions->add($transaction);
-            $transaction->setFkTrtId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTransaction(self $transaction): static
-    {
-        if ($this->transactions->removeElement($transaction)) {
-            // set the owning side to null (unless already changed)
-            if ($transaction->getFkTrtId() === $this) {
-                $transaction->setFkTrtId(null);
-            }
-        }
 
         return $this;
     }

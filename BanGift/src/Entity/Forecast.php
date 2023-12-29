@@ -12,11 +12,11 @@ class Forecast
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(["forecast_group"])]
+    #[Groups(["forecast_group", "banqueAccount_group_create"])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups(["forecast_group"])]
+    #[Groups(["forecast_group", "banqueAccount_group"])]
     private array $frc_amounts = [];
 
     public function getId(): ?int
